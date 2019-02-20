@@ -15,6 +15,7 @@ import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.webkit.URLUtil;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.vision.CameraSource;
@@ -34,13 +35,16 @@ public class ActivitiQR extends AppCompatActivity {
     private String token = "";
     private String tokenanterior = "";
     private SocketClient cliente;
+    public static String LECTOR_QR="";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activiti_qr);
-        cliente = new SocketClient("192.168.1.8",100);
+        cliente = new SocketClient(MainActivity.direccionIp,100);
         cameraView = (SurfaceView) findViewById(R.id.camera_view);
         initQR();
+
     }
 
     public void initQR() {
@@ -104,6 +108,7 @@ public class ActivitiQR extends AppCompatActivity {
 
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
+
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
 
                 if (barcodes.size() > 0) {
@@ -119,6 +124,7 @@ public class ActivitiQR extends AppCompatActivity {
                         tokenanterior = token;
                         Log.i("token", token);
                         cliente.send(token);//envio dato del escaner qr
+                        LECTOR_QR = token;
                         Vibrator v = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
                         v.vibrate(500);
                         new Thread(new Runnable() {
@@ -136,6 +142,8 @@ public class ActivitiQR extends AppCompatActivity {
                                 }
                             }
                         }).start();
+                        //Finaliza la ventana qr
+                        finish();
 
                     }
 
